@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './domain/entites/user';
-import { ApiModule } from './api/api.module';
+import { User } from 'src/domain/entites/user';
+import { UserController } from './user.controller';
+import { UserService } from 'src/domain/services/user.service';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -17,9 +17,8 @@ import { ApiModule } from './api/api.module';
       synchronize: true,
     }),
     TypeOrmModule.forFeature([User]),
-    ApiModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [UserController],
+  providers: [UserService],
 })
-export class AppModule {}
+export class ApiModule {}
