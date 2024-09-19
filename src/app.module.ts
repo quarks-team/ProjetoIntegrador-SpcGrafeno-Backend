@@ -4,18 +4,16 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './domain/entites/user';
 import { ApiModule } from './api/api.module';
+import { AppConfigModule } from './infra/config/config.module';
+import { TypeOrmService } from './infra/database/typeorm.service';
+import { DBModule } from './infra/database/db.mocule';
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'root',
-      password: 'admin',
-      database: 'recivables',
-      entities: [User],
-      synchronize: true,
+    AppConfigModule,
+    TypeOrmModule.forRootAsync({
+      useClass: TypeOrmService,
     }),
+    DBModule,
     TypeOrmModule.forFeature([User]),
     ApiModule,
   ],

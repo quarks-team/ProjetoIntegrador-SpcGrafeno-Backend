@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/domain/entites/user';
 import { UserController } from './user.controller';
 import { UserService } from 'src/domain/services/user.service';
+import { Storage } from '../infra/storage/storage';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { UserService } from 'src/domain/services/user.service';
     TypeOrmModule.forFeature([User]),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, Storage],
 })
 export class ApiModule {}
