@@ -1,0 +1,8 @@
+
+Here is the Entity-Relationship (ER) Diagram representing the DDL for the consent management system:
+
+Users Table: Stores user details, including CNPJ, consent status, and consent/revocation dates.
+Consent History Table: Logs changes in the consent status, referencing the user and recording timestamps.
+Policies Table: Stores policy information such as name, description, version, and timestamps.
+User Policies Table: Tracks which policies a user has accepted, including the policy version and acceptance timestamp.
+This ER diagram illustrates the relationships between the tables, where user_id is the foreign key connecting tables like consent_history and user_policies to the users table, and policy_id is connected to the policies table. The user_policies table records which policies were accepted by each user.
