@@ -5,7 +5,7 @@ import { User } from './user.entity';
 import { Storage } from '../../infra/storage/storage';
 import * as fs from 'fs';
 import { Stream } from 'stream';
-import { hash } from 'bcrypt';
+import { compareSync, hash } from 'bcrypt';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 
@@ -15,6 +15,7 @@ export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectQueue('user-created') private userCreatedQueue: Queue,
+    @InjectQueue('user-consent') private userConsentQueue: Queue,
     private storage: Storage,
   ) {
     this.repository = this.userRepository;
@@ -31,7 +32,24 @@ export class UserService {
     return user;
   }
 
+  async login(userData: Partial<User>): Promise<User> {
+    const user = await this.repository.findOne({
+      where: {
+        username: userData.username,
+      },
+    });
+    if (compareSync(userData.password, user.password)) {
+      return user;
+    } else {
+      throw new Error('Invalid credentials');
+    }
+  }
+
   async update(user: User): Promise<User> {
+    if (user.consentStatus === true) {
+      await this.userConsentQueue.add('user-consent', { userId: user.id });
+      user.consentDate = new Date();
+    }
     return await this.repository.save(user);
   }
 
@@ -61,5 +79,13 @@ export class UserService {
       path: './deletedList',
     });
     return await this.repository.delete(userId);
+  }
+
+  async InvalidatePolicyAllUsers(): Promise<void> {
+    await this.repository
+      .createQueryBuilder()
+      .update()
+      .set({ consentDate: null, consentStatus: false })
+      .execute();
   }
 }

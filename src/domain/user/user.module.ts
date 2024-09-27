@@ -13,6 +13,9 @@ import { BullModule } from '@nestjs/bullmq';
     BullModule.registerQueue({
       name: 'user-created',
     }),
+    BullModule.registerQueue({
+      name: 'user-consent',
+    }),
   ],
   providers: [UserService],
   controllers: [UserController],

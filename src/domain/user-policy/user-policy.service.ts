@@ -46,6 +46,15 @@ export class UserPolicyService {
       } as unknown as UserPolicy;
     });
     await this.userPolicyRepository.save(userPolicies);
+    this.userService.InvalidatePolicyAllUsers();
+  }
+
+  async updateUserPolicyConsent(userId: string): Promise<void> {
+    await this.userPolicyRepository
+      .createQueryBuilder()
+      .update()
+      .set({ isActive: true })
+      .where({ userId: userId });
   }
 
   async getUserPolicyById(id: string): Promise<UserPolicy> {
