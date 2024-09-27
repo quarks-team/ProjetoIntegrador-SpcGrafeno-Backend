@@ -5,7 +5,7 @@ import { User } from './user.entity';
 import { Storage } from '../../infra/storage/storage';
 import * as fs from 'fs';
 import { Stream } from 'stream';
-import { hash } from 'bcrypt';
+import { compareSync, hash } from 'bcrypt';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 
@@ -29,6 +29,19 @@ export class UserService {
     user = await this.repository.save(user);
     await this.userCreatedQueue.add('user-created', { userId: user.id });
     return user;
+  }
+
+  async login(userData: Partial<User>): Promise<User> {
+    const user = await this.repository.findOne({
+      where: {
+        username: userData.username,
+      },
+    });
+    if (compareSync(userData.password, user.password)) {
+      return user;
+    } else {
+      throw new Error('Invalid credentials');
+    }
   }
 
   async update(user: User): Promise<User> {

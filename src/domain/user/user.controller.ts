@@ -6,11 +6,13 @@ import {
   Param,
   Patch,
   Post,
+  Res,
 } from '@nestjs/common';
 import { ApiBody, ApiParam } from '@nestjs/swagger';
 import { User } from '../user/user.entity';
 import { UserService } from './user.service';
 import { DeleteResult } from 'typeorm';
+import { Response } from 'express';
 
 const UserSchema = {
   value: {
@@ -37,6 +39,23 @@ export class UserController {
   })
   async createUser(@Body() user: User): Promise<User> {
     return await this.userService.create(user);
+  }
+
+  @Post('login')
+  @ApiBody({
+    type: User,
+    examples: { user: UserSchema },
+  })
+  async login(
+    @Body() user: Partial<User>,
+    @Res() res: Response,
+  ): Promise<Response> {
+    try {
+      const result = await this.userService.login(user);
+      return res.status(200).json(result);
+    } catch (e) {
+      return res.status(401).json({ message: e.message });
+    }
   }
 
   @Patch()
