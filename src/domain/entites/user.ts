@@ -20,17 +20,11 @@ export class User {
   @Column()
   email: string;
 
-  @Column({ default: false, nullable: true })
-  consentStatus: boolean;
-
-  @Column({ nullable: true })
-  consentDate: Date;
-
   @Column()
   phoneNumber: string;
 
-  @Column({ nullable: true })
-  cnpj: string;
+  @Column()
+  companyId: number;
 
   @CreateDateColumn()
   createdAt: Date;
