@@ -8,8 +8,8 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiBody, ApiParam } from '@nestjs/swagger';
-import { User } from 'src/domain/entites/user';
-import { UserService } from 'src/domain/services/user.service';
+import { User } from '../user/user.entity';
+import { UserService } from './user.service';
 import { DeleteResult } from 'typeorm';
 
 const UserSchema = {
@@ -27,7 +27,7 @@ export class UserController {
 
   @Get()
   async getAllUsers(): Promise<User[]> {
-    return await this.userService.getHello();
+    return await this.userService.getAll();
   }
 
   @Post()
