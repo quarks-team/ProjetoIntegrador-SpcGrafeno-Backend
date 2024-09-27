@@ -1,29 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
-import { User } from '../entites/user';
+import { User } from './user.entity';
 import { Storage } from '../../infra/storage/storage';
 import * as fs from 'fs';
 import { Stream } from 'stream';
 import { hash } from 'bcrypt';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class UserService {
   repository: Repository<User>;
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectQueue('user-created') private userCreatedQueue: Queue,
     private storage: Storage,
   ) {
-    this.repository = userRepository;
+    this.repository = this.userRepository;
   }
 
-  async getHello(): Promise<User[]> {
+  async getAll(): Promise<User[]> {
     return await this.repository.find();
   }
 
   async create(user: User): Promise<User> {
     user.password = await hash(user.password, 10);
-    return await this.repository.save(user);
+    user = await this.repository.save(user);
+    await this.userCreatedQueue.add('user-created', { userId: user.id });
+    return user;
   }
 
   async update(user: User): Promise<User> {
