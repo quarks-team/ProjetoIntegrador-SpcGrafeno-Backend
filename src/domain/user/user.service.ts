@@ -15,6 +15,7 @@ export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectQueue('user-created') private userCreatedQueue: Queue,
+    @InjectQueue('user-consent') private userConsentQueue: Queue,
     private storage: Storage,
   ) {
     this.repository = this.userRepository;
@@ -45,6 +46,10 @@ export class UserService {
   }
 
   async update(user: User): Promise<User> {
+    if (user.consentStatus === true) {
+      await this.userConsentQueue.add('user-consent', { userId: user.id });
+      user.consentDate = new Date();
+    }
     return await this.repository.save(user);
   }
 
@@ -74,5 +79,13 @@ export class UserService {
       path: './deletedList',
     });
     return await this.repository.delete(userId);
+  }
+
+  async InvalidatePolicyAllUsers(): Promise<void> {
+    await this.repository
+      .createQueryBuilder()
+      .update()
+      .set({ consentDate: null, consentStatus: false })
+      .execute();
   }
 }

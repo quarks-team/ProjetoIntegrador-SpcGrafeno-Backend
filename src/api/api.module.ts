@@ -7,6 +7,7 @@ import { UserPolicy } from 'src/domain/user-policy/user-policy.entity';
 import { UserModule } from '../domain/user/user.module';
 import { PolicyModule } from 'src/domain/policy/policy.module';
 import { UserPolicyModule } from 'src/domain/user-policy/user-policy.module';
+import { ScoreModule } from 'src/domain/score/score.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserPolicyModule } from 'src/domain/user-policy/user-policy.module';
     UserModule,
     PolicyModule,
     UserPolicyModule,
+    ScoreModule,
   ],
 })
 export class ApiModule {}
