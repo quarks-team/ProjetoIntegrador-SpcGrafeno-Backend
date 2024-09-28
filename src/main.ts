@@ -5,6 +5,12 @@ import { SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors({
+    origin: ['http://localhost:9090/login', 'http://localhost:9090/register', 'http://localhost:9090/home'],
+    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+    credentials: true, // Permitir cookies ou autenticação se necessário
+  });
+  
   SwaggerModule.setup(
     'api',
     app,
