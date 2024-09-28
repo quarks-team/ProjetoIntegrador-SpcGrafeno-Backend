@@ -35,7 +35,7 @@ export class UserService {
   async login(userData: Partial<User>): Promise<User> {
     const user = await this.repository.findOne({
       where: {
-        username: userData.username,
+        email: userData.email,
       },
     });
     if (compareSync(userData.password, user.password)) {
