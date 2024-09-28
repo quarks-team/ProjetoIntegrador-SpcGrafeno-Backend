@@ -11,7 +11,7 @@ export class EndorserScore {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column()
   active: number;
 
   @Column()
@@ -27,8 +27,8 @@ export class EndorserScore {
   score: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 }
