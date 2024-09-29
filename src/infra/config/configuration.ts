@@ -1,5 +1,5 @@
 export default () => ({
-  port: parseInt(process.env.PORT, 10) || 3000,
+  port: parseInt(process.env.PORT, 10) || 80,
   storage: {
     url: process.env.STORAGE_URL,
     bucket: process.env.BUCKET,
