@@ -32,4 +32,24 @@ export class ScoreController {
       );
     }
   }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all users scores' })
+  @ApiResponse({
+    status: 200,
+    description: 'List from all users scores',
+    type: EndorserScore,
+  })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  async getAllScores() {
+    try {
+      const scores = await this.scoreService.getAllScores();
+      return { scores };
+    } catch (error) {
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

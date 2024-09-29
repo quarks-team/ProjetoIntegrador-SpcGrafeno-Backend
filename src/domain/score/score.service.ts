@@ -28,4 +28,8 @@ export class ScoreService {
       },
     });
   }
+
+  async getAllScores(): Promise<EndorserScore[]> {
+    return await this.endorserScoreRepository.find();
+  }
 }
