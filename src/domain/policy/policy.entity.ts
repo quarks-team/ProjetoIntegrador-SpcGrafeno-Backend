@@ -10,6 +10,8 @@ export class Policy {
   description: string;
   @Column()
   version: number;
+  @Column()
+  isActive: boolean;
   @Column({ default: new Date() })
   createdAt: Date;
   @Column({ default: new Date() })

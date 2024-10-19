@@ -1984,10 +1984,10 @@ buildcheck@~0.0.6:
   resolved "https://registry.yarnpkg.com/buildcheck/-/buildcheck-0.0.6.tgz#89aa6e417cfd1e2196e3f8fe915eb709d2fe4238"
   integrity sha512-8f9ZJCUXyT1M35Jx7MkBgmBMo3oHTTBIPLiY9xyL0pl3T5RwcPEY8cUHr5LBNfu/fk6c2T4DJZuVM/8ZZT2D2A==
 
-bullmq@^5.13.2:
-  version "5.13.2"
-  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-5.13.2.tgz#33af1f9ce42e819cb522bf7aed86dc2fe8ea5c11"
-  integrity sha512-McGE8k3mrCvdUHdU0sHkTKDS1xr4pff+hbEKBY51wk5S6Za0gkuejYA620VQTo3Zz37E/NVWMgumwiXPQ3yZcA==
+bullmq@^5.20.0:
+  version "5.20.0"
+  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-5.20.0.tgz#5d2ab90f4a7d40a533fae9fee9ca27eaa13066ff"
+  integrity sha512-eCJyYJqNUl9swC39x2fVm1BUv5BuO/nv2eAcAsz58znue0ZCYgSG+yWXZeauRG98Jl0UIBcPgJtbF+c9Wd+Odg==
   dependencies:
     cron-parser "^4.6.0"
     ioredis "^5.4.1"

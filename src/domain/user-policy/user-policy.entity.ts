@@ -11,7 +11,7 @@ export class UserPolicy {
   @Column()
   policyId: number;
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  acceptanceDate: Date;
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
