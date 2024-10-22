@@ -19,7 +19,7 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
       database: databaseEnv.name,
       entities: [User, Policy],
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false,
     };
   }
 }
