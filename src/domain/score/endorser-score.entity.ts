@@ -6,29 +6,23 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('ai_score_results')  // Mapeando explicitamente para a tabela 'ai_score_results'
 export class EndorserScore {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn('uuid')  // Coluna result_id será um UUID
+  resultId: string;  // Renomeado para 'resultId' para corresponder ao nome da coluna
 
-  @Column()
-  active: number;
+  @Column({ name: 'final_score' })
+  finalScore: number;  // Mapeando para 'final_score'
 
-  @Column()
-  cnpj: string;
+  @Column({ name: 'input_variables', type: 'jsonb' })
+  inputVariables: any;  // Usando 'any' para armazenar JSONB (pode ser ajustado conforme a estrutura esperada)
 
-  @Column()
-  canceled: number;
+  @Column({ name: 'endorser_name' })
+  endorserName: string;  // Mapeando para 'endorser_name'
 
-  @Column()
-  finished: number;
+  @Column({ name: 'cnpj', nullable: true })  // Adicionando a coluna cnpj
+  cnpj: string;  // Mapeando para 'cnpj'
 
-  @Column()
-  score: number;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
+  @CreateDateColumn({ name: 'created_timestamp', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdTimestamp: Date;  // Mapeando para 'created_timestamp'
 }
