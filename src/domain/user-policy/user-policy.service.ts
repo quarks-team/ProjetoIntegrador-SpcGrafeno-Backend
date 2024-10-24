@@ -39,11 +39,13 @@ export class UserPolicyService {
 
   async createPolicyForAllUsers(policyId: number): Promise<void> {
     const users = await this.userService.getAll();
+    const policy = await this.policyService.getById(policyId);
     const userPolicies = users.map((user) => {
       return {
         userId: user.id,
         policyId: policyId,
         isActive: false,
+        isMandatory: policy.isMandatory,
       } as unknown as UserPolicy;
     });
     await this.userPolicyRepository.save(userPolicies);

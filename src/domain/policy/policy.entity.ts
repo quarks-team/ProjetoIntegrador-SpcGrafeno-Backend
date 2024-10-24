@@ -1,28 +1,40 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('policy') // Nome da tabela
+@Entity('policy')
 export class Policy {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'name' }) // Mapeamento para a coluna "name"
+  @Column({ name: 'name' })
   name: string;
 
-  @Column({ name: 'description' }) // Mapeamento para a coluna "description"
+  @Column({ name: 'description' })
   description: string;
 
-  @Column({ name: 'version' }) // Mapeamento para a coluna "version"
+  @Column({ name: 'version' })
   version: number;
 
-  @Column({ name: 'is_active', default: true }) // Mapeamento para "is_active"
+  @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
-  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }) // Mapeamento para "created_at"
+  @Column({ name: 'is_active', default: true })
+  isMandatory: boolean;
+
+  @Column({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' }) // Mapeamento para "updated_at"
+  @Column({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
-  @Column({ name: 'excluded_at', type: 'timestamp', nullable: true }) // Mapeamento para "excluded_at"
+  @Column({ name: 'excluded_at', type: 'timestamp', nullable: true })
   excludedAt: Date;
 }

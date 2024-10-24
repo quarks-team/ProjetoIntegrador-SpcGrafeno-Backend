@@ -37,7 +37,7 @@ export class PolicyService {
     );
   }
 
-  async getById(id: string): Promise<Policy> {
+  async getById(id: number): Promise<Policy> {
     return this.repository.findOne(id);
   }
 
