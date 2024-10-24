@@ -10,7 +10,7 @@ async function bootstrap() {
     methods: 'GET,POST,PUT,DELETE,OPTIONS',
     credentials: true, // Permitir cookies ou autenticação se necessário
   });
-  
+
   SwaggerModule.setup(
     'api',
     app,

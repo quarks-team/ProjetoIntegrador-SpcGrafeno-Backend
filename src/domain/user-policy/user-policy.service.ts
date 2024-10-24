@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PolicyService } from '../policy/policy.service';
 import { UserService } from '../user/user.service';
+import { Consent } from './user-consents.requests';
 
 @Injectable()
 export class UserPolicyService {
@@ -75,5 +76,40 @@ export class UserPolicyService {
 
   async getAllUserPolicies(): Promise<UserPolicy[]> {
     return this.userPolicyRepository.find();
+  }
+
+  async getUserPolicyByUserId(userId: number): Promise<UserPolicy[]> {
+    return this.userPolicyRepository.find({
+      where: {
+        userId: userId,
+      },
+    });
+  }
+
+  async updateUserConsents(userId: number, consents: Consent[]): Promise<void> {
+    this.userPoliciesRepo
+      .createQueryBuilder()
+      .update(UserPolicy)
+      .set({
+        isActive: true,
+      })
+      .where('userId = :userId and policyId in : policies', {
+        userId,
+        policies: consents.map((consent) =>
+          consent.status == true ? consent.id : '',
+        ),
+      });
+    this.userPoliciesRepo
+      .createQueryBuilder()
+      .update(UserPolicy)
+      .set({
+        isActive: true,
+      })
+      .where('userId = :userId and policyId in : policies', {
+        userId,
+        policies: consents.map((consent) =>
+          consent.status == false ? consent.id : '',
+        ),
+      });
   }
 }
