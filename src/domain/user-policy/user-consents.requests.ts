@@ -6,4 +6,5 @@ export type UpdateUserConsentRequest = {
 export type Consent = {
   id: number;
   status: boolean;
+  isMandatory: boolean;
 };

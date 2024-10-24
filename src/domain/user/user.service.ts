@@ -88,4 +88,16 @@ export class UserService {
       .set({ consentDate: null, consentStatus: false })
       .execute();
   }
+
+  async updateUserConsent(userId, status) {
+    await this.repository
+      .createQueryBuilder()
+      .update()
+      .set({
+        consentDate: status == false ? null : new Date(),
+        consentStatus: status,
+      })
+      .where('userId = :userId', { userId })
+      .execute();
+  }
 }

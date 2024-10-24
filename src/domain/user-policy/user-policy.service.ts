@@ -87,6 +87,16 @@ export class UserPolicyService {
   }
 
   async updateUserConsents(userId: number, consents: Consent[]): Promise<void> {
+    if (
+      consents.some(
+        (consent) => consent.status == false && consent.isMandatory == true,
+      )
+    ) {
+      this.userService.updateUserConsent(userId, false);
+    } else {
+      this.userService.updateUserConsent(userId, true);
+    }
+
     this.userPoliciesRepo
       .createQueryBuilder()
       .update(UserPolicy)
