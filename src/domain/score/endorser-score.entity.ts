@@ -7,7 +7,7 @@ import {
 
 @Entity('ai_score_results')
 export class EndorserScore {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: 'result_id' })
   resultId: string;
 
   @Column({ name: 'final_score' })

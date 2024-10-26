@@ -11,19 +11,19 @@ import { ScoreService } from './score.service';
 
 @Controller('score')
 export class ScoreController {
-  constructor(private readonly scoreService: ScoreService) {}
+  constructor(private readonly scoreService: ScoreService) { }
 
-  @Get(':cnpj')
-  @ApiOperation({ summary: 'Get user score' })
+  @Get(':endorser')
+  @ApiOperation({ summary: 'Get user score by endorser - name' })
   @ApiResponse({
     status: 200,
     description: 'The user score',
     type: EndorserScore,
   })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  async getScore(@Param('cnpj') cnpj: string) {
+  async getScore(@Param('endorser') endorserName: string) {
     try {
-      const score = await this.scoreService.getScore(cnpj);
+      const score = await this.scoreService.getScore(endorserName);
       return { score };
     } catch (error) {
       throw new HttpException(
