@@ -105,7 +105,7 @@ export class UserPolicyService {
       .set({
         isActive: true,
       })
-      .where('userId = :userId and policyId in : policies', {
+      .where('user_id = :userId and policyId in : policy', {
         userId,
         policies: consents.map((consent) =>
           consent.status == true ? consent.id : '',
@@ -117,7 +117,7 @@ export class UserPolicyService {
       .set({
         isActive: true,
       })
-      .where('userId = :userId and policyId in : policies', {
+      .where('user_id = :userId and policyId in : policy', {
         userId,
         policies: consents.map((consent) =>
           consent.status == false ? consent.id : '',
