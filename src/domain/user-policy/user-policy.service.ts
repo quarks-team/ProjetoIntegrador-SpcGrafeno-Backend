@@ -89,39 +89,52 @@ export class UserPolicyService {
   }
 
   async updateUserConsents(userId: number, consents: Consent[]): Promise<void> {
-    if (
-      consents.some(
-        (consent) => consent.status == false && consent.isMandatory == true,
-      )
-    ) {
-      this.userService.updateUserConsent(userId, false);
+    const hasMandatoryFalse = consents.some(
+      consent => consent.status === false && consent.isMandatory === true
+    );
+
+    if (hasMandatoryFalse) {
+      await this.userService.updateUserConsent(userId, false);
     } else {
-      this.userService.updateUserConsent(userId, true);
+      const allMandatoryTrue = consents.every(
+        consent => consent.isMandatory === false || consent.status === true
+      );
+
+      if (allMandatoryTrue) {
+        await this.userService.updateUserConsent(userId, true);
+      }
     }
 
-    this.userPoliciesRepo
-      .createQueryBuilder()
-      .update(UserPolicy)
-      .set({
-        isActive: true,
-      })
-      .where('user_id = :userId and policy_id in : user', {
-        userId,
-        policies: consents.map((consent) =>
-          consent.status == true ? consent.id : '',
-        ),
-      });
-    this.userPoliciesRepo
-      .createQueryBuilder()
-      .update(UserPolicy)
-      .set({
-        isActive: true,
-      })
-      .where('user_id = :userId and policy_id in : user', {
-        userId,
-        policies: consents.map((consent) =>
-          consent.status == false ? consent.id : '',
-        ),
-      });
+    const activePolicies = consents
+      .filter(consent => consent.status === true)
+      .map(consent => consent.id);
+
+    const inactivePolicies = consents
+      .filter(consent => consent.status === false)
+      .map(consent => consent.id);
+
+    if (activePolicies.length > 0) {
+      await this.userPoliciesRepo
+        .createQueryBuilder()
+        .update(UserPolicy)
+        .set({
+          isActive: true,
+        })
+        .where('user_id = :userId AND policy_id IN (:...activePolicies)', { userId, activePolicies })
+        .execute();
+    }
+
+    if (inactivePolicies.length > 0) {
+      await this.userPoliciesRepo
+        .createQueryBuilder()
+        .update(UserPolicy)
+        .set({
+          isActive: false,
+        })
+        .where('user_id = :userId AND policy_id IN (:...inactivePolicies)', { userId, inactivePolicies })
+        .execute();
+    }
   }
+
+
 }
