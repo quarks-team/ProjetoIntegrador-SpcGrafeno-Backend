@@ -1,33 +1,47 @@
-import { Body, Controller, Get, Param, Post, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiBody } from '@nestjs/swagger';
-import { UserPolicyService } from './user-policy.service';
-import { UserPolicy } from './user-policy.entity';
+import { UserTermsService } from './user-terms.service';
+import { UserTerms } from './user-terms.entity';
 import { UpdateUserConsentRequest } from './user-consents.requests';
 
 @Controller('user-consent')
 export class UserConsentController {
-  constructor(private readonly userPolicyService: UserPolicyService) {}
+  constructor(private readonly userTermsService: UserTermsService) {}
 
   @Get('/:id')
-  async getAllUserPolicy(@Param('id') userId: number): Promise<UserPolicy[]> {
+  async getAllUserTerms(@Param('id') userId: number): Promise<UserTerms[]> {
     try {
-      return await this.userPolicyService.getUserPolicyByUserId(userId);
+      return await this.userTermsService.getUserTermsByUserId(userId);
     } catch (error) {
-      throw new HttpException('Failed to retrieve user policies', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to retrieve user policies',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   @Post('/update')
-  @ApiBody({ type: UpdateUserConsentRequest }) 
+  @ApiBody({ type: UpdateUserConsentRequest })
   async updateUserConsent(@Body() userConsents: UpdateUserConsentRequest) {
     try {
-      await this.userPolicyService.updateUserConsents(
+      await this.userTermsService.updateUserConsents(
         userConsents.userId,
         userConsents.consents,
       );
       return { message: 'User consent updated successfully' }; // Optionally return a success message
     } catch (error) {
-      throw new HttpException('Failed to update user consent', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to update user consent',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
