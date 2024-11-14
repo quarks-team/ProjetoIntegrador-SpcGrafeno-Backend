@@ -17,7 +17,7 @@ export class Policy {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
-  @Column({ name: 'is_active', default: true })
+  @Column({ name: 'is_mandatory', default: true })
   isMandatory: boolean;
 
   @Column({

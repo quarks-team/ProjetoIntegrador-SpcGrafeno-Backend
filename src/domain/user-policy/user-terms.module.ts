@@ -8,6 +8,7 @@ import { UserConsentController } from './user-consent.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserTermsSchema } from './user-terms.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UpdateConsentStatusConsumer } from './update-consent-status.consumer';
 
 @Module({
   imports: [
@@ -28,7 +29,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     PolicyModule,
   ],
   controllers: [UserConsentController],
-  providers: [UserTermsService, UserConsumer, PolicyConsumer],
+  providers: [
+    UserTermsService,
+    UserConsumer,
+    PolicyConsumer,
+    UpdateConsentStatusConsumer,
+  ],
   exports: [UserTermsService],
 })
 export class UserPolicyModule {}
