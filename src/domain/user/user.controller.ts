@@ -13,6 +13,7 @@ import { User } from '../user/user.entity';
 import { UserService } from './user.service';
 import { DeleteResult } from 'typeorm';
 import { Response } from 'express';
+import { UpdateConsentTerms } from './update-consent-terms.request';
 
 const UserSchema = {
   value: {
@@ -21,6 +22,12 @@ const UserSchema = {
     email: 'teste@teste.com.br',
     phoneNumber: '(12) 99820-0292',
     companyId: 1,
+  },
+};
+const UserConsentUpdateSchema = {
+  value: {
+    userId: 1,
+    consentStatus: true,
   },
 };
 @Controller('user')
@@ -39,6 +46,18 @@ export class UserController {
   })
   async createUser(@Body() user: User): Promise<User> {
     return await this.userService.create(user);
+  }
+
+  @Post('/update-user-consent')
+  @ApiBody({
+    type: User,
+    examples: { user: UserConsentUpdateSchema },
+  })
+  async updateConsentSta(@Body() payload: UpdateConsentTerms) {
+    await this.userService.acceptanceTerms(
+      payload.userId,
+      payload.consentStatus,
+    );
   }
 
   @Post('login')

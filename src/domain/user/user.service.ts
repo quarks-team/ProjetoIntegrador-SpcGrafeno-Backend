@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { User } from './user.entity';
 import { Storage } from '../../infra/storage/storage';
 import * as fs from 'fs';
@@ -31,7 +31,11 @@ export class UserService {
 
   async create(user: User): Promise<User> {
     user.password = await hash(user.password, 10);
-    user = await this.repository.save(user);
+    user = await this.repository.save({
+      ...user,
+      consentStatus: true,
+      consentDate: new Date(),
+    });
     await this.userCreatedQueue.add('user-created', { userId: user.id });
     return user;
   }
@@ -55,6 +59,23 @@ export class UserService {
       user.consentDate = new Date();
     }
     return await this.repository.save(user);
+  }
+
+  async acceptanceTerms(
+    userId: number,
+    consentStatus: boolean,
+  ): Promise<UpdateResult> {
+    const user = await this.repository.update(
+      { id: userId },
+      {
+        consentStatus: consentStatus,
+        consentDate: consentStatus ? new Date() : null,
+      },
+    );
+    if (consentStatus) {
+      await this.userConsentQueue.add('user-consent', { userId: userId });
+    }
+    return user;
   }
 
   async delete(userId: string): Promise<DeleteResult> {
@@ -86,11 +107,10 @@ export class UserService {
   }
 
   async InvalidatePolicyAllUsers(): Promise<void> {
-    await this.repository
-      .createQueryBuilder()
-      .update()
-      .set({ consentDate: null, consentStatus: false })
-      .execute();
+    await this.repository.update(
+      {},
+      { consentStatus: false, consentDate: null },
+    );
   }
 
   async updateUserConsent(userId: number, status: boolean) {
