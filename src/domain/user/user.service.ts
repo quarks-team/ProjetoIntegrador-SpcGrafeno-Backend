@@ -25,6 +25,10 @@ export class UserService {
     return await this.repository.find();
   }
 
+  async getById(userId: string): Promise<User> {
+    return await this.repository.findOne(userId);
+  }
+
   async create(user: User): Promise<User> {
     user.password = await hash(user.password, 10);
     user = await this.repository.save(user);
@@ -100,5 +104,4 @@ export class UserService {
       .where('id = :userId', { userId })
       .execute();
   }
-
 }
