@@ -1,24 +1,17 @@
 import { Module } from '@nestjs/common';
 import { UserTermsService } from './user-terms.service';
-import { PolicyModule } from '../policy/policy.module';
+import { AcceptanceTermModule } from '../acceptance-terms/module';
 import { UserModule } from '../user/user.module';
-import { PolicyConsumer } from './policy-created.consumer';
+import { AcceptanceTerm } from './acceptance-term-created.consumer';
 import { UserConsumer } from './user-created.consumer';
 import { UserConsentController } from './user-consent.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserTermsSchema } from './user-terms.entity';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UpdateConsentStatusConsumer } from './update-consent-status.consumer';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get('mongoUri'),
-      }),
-      inject: [ConfigService],
-    }),
     MongooseModule.forFeature([
       {
         name: 'UserTerms',
@@ -26,15 +19,16 @@ import { UpdateConsentStatusConsumer } from './update-consent-status.consumer';
       },
     ]),
     UserModule,
-    PolicyModule,
+    AcceptanceTermModule,
   ],
   controllers: [UserConsentController],
   providers: [
     UserTermsService,
     UserConsumer,
-    PolicyConsumer,
+    AcceptanceTerm,
     UpdateConsentStatusConsumer,
+    JwtService,
   ],
   exports: [UserTermsService],
 })
-export class UserPolicyModule {}
+export class UserTermsModule {}

@@ -7,34 +7,64 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiParam } from '@nestjs/swagger';
 import { User } from '../user/user.entity';
 import { UserService } from './user.service';
 import { DeleteResult } from 'typeorm';
 import { Response } from 'express';
-import { UpdateConsentTerms } from './update-consent-terms.request';
+import { AcceptanceTerm } from '../acceptance-terms/acceptance-term.entity';
+import { AuthGuard } from 'src/infra/auth/auth.guard';
+
+const AcceptanceTermsSchema = {
+  _id: '6736a1e9e76eb8f3f7b2422a',
+  version: 1,
+  isActive: true,
+  description: 'AcceptanceTerm description',
+  items: [
+    {
+      name: 'padrão',
+      description: 'boa',
+      tag: 'EMAIL-COMMUNICATION',
+      isMandatory: false,
+    },
+    {
+      name: 'mandatória',
+      description: 'boa pa nois',
+      tag: 'DATA-USAGE',
+      isMandatory: true,
+    },
+  ],
+  createdAt: '2024-11-15T00:35:44.582Z',
+  restrictions: ['EMAIL-COMMUNICATION'],
+  __v: 0,
+};
 
 const UserSchema = {
   value: {
     username: 'user',
     password: 'boa pa nois',
     email: 'teste@teste.com.br',
-    phoneNumber: '(12) 99820-0292',
-    companyId: 1,
-  },
-};
-const UserConsentUpdateSchema = {
-  value: {
-    userId: 1,
     consentStatus: true,
+    acceptanceTerms: AcceptanceTermsSchema,
+    consentDate: new Date(),
+    cnpj: '123120397102973109',
   },
 };
+
+// const UserConsentUpdateSchema = {
+//   value: {
+//     userId: 1,
+//     consentStatus: true,
+//   },
+// };
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @UseGuards(AuthGuard)
   async getAllUsers(): Promise<User[]> {
     return await this.userService.getAll();
   }
@@ -48,23 +78,12 @@ export class UserController {
     return await this.userService.create(user);
   }
 
-  @Post('/update-user-consent')
-  @ApiBody({
-    type: User,
-    examples: { user: UserConsentUpdateSchema },
-  })
-  async updateConsentSta(@Body() payload: UpdateConsentTerms) {
-    await this.userService.acceptanceTerms(
-      payload.userId,
-      payload.consentStatus,
-    );
-  }
-
   @Post('login')
   @ApiBody({
     type: User,
     examples: { user: UserSchema },
   })
+  @UseGuards()
   async login(
     @Body() user: Partial<User>,
     @Res() res: Response,
@@ -89,8 +108,45 @@ export class UserController {
       },
     },
   })
+  @UseGuards(AuthGuard)
   async updateUser(@Body() user: User): Promise<User> {
     return await this.userService.update(user);
+  }
+
+  @Patch('acceptance-terms')
+  @ApiBody({
+    type: User,
+    examples: {
+      userAcceptanceTerms: {
+        value: {
+          acceptanceTerms: AcceptanceTermsSchema,
+          _id: 'idhaowdhoaiwda',
+        },
+      },
+    },
+  })
+  @UseGuards(AuthGuard)
+  async updateAcceptanceTerms(@Body() user: Partial<User>): Promise<User> {
+    return await this.userService.acceptanceTerms(
+      user._id.toString(),
+      user.acceptanceTerms as unknown as AcceptanceTerm,
+    );
+  }
+
+  @Patch('revoke-terms')
+  @ApiBody({
+    type: User,
+    examples: {
+      userAcceptanceTerms: {
+        value: {
+          _id: 'idhaowdhoaiwda',
+        },
+      },
+    },
+  })
+  @UseGuards(AuthGuard)
+  async revokeAcceptanceTerms(@Body() user: Partial<User>): Promise<User> {
+    return await this.userService.revokeTerms(user._id.toString());
   }
 
   @Delete('/:id')
@@ -99,6 +155,7 @@ export class UserController {
     required: true,
     type: 'string',
   })
+  @UseGuards(AuthGuard)
   async deleteUser(@Param('id') id: string): Promise<DeleteResult> {
     return await this.userService.delete(id);
   }

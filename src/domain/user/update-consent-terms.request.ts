@@ -1,4 +1,4 @@
 export type UpdateConsentTerms = {
-  userId: number;
+  userId: string;
   consentStatus: boolean;
 };
