@@ -9,7 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiParam } from '@nestjs/swagger';
 import { User } from '../user/user.entity';
 import { UserService } from './user.service';
 import { DeleteResult } from 'typeorm';
@@ -65,6 +65,7 @@ export class UserController {
 
   @Get()
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async getAllUsers(): Promise<User[]> {
     return await this.userService.getAll();
   }
@@ -109,6 +110,7 @@ export class UserController {
     },
   })
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async updateUser(@Body() user: User): Promise<User> {
     return await this.userService.update(user);
   }
@@ -126,6 +128,7 @@ export class UserController {
     },
   })
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async updateAcceptanceTerms(@Body() user: Partial<User>): Promise<User> {
     return await this.userService.acceptanceTerms(
       user._id.toString(),
@@ -144,6 +147,7 @@ export class UserController {
       },
     },
   })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async revokeAcceptanceTerms(@Body() user: Partial<User>): Promise<User> {
     return await this.userService.revokeTerms(user._id.toString());
@@ -156,6 +160,8 @@ export class UserController {
     type: 'string',
   })
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiBearerAuth()
   async deleteUser(@Param('id') id: string): Promise<DeleteResult> {
     return await this.userService.delete(id);
   }
