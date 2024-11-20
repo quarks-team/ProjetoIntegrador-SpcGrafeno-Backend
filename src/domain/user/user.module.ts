@@ -2,13 +2,20 @@ import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { StorageModule } from 'src/infra/storage/storage.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user.entity';
 import { BullModule } from '@nestjs/bullmq';
+import { MongooseModule } from '@nestjs/mongoose';
+// import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserSchema } from './user.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    MongooseModule.forFeature([
+      {
+        name: 'User',
+        schema: UserSchema,
+      },
+    ]),
     StorageModule,
     BullModule.registerQueue({
       name: 'user-created',
@@ -17,7 +24,7 @@ import { BullModule } from '@nestjs/bullmq';
       name: 'user-consent',
     }),
   ],
-  providers: [UserService],
+  providers: [UserService, JwtService],
   controllers: [UserController],
   exports: [UserService],
 })

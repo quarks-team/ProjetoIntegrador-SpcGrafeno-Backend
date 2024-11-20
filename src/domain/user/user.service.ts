@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { User } from './user.entity';
 import { Storage } from '../../infra/storage/storage';
 import * as fs from 'fs';
@@ -8,46 +6,57 @@ import { Stream } from 'stream';
 import { compareSync, hash } from 'bcrypt';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
+import { AcceptanceTerm } from '../acceptance-terms/acceptance-term.entity';
+import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from 'src/infra/auth/constants';
 
 @Injectable()
 export class UserService {
-  repository: Repository<User>;
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectModel('User') private readonly userModel: Model<User>,
     @InjectQueue('user-created') private userCreatedQueue: Queue,
     @InjectQueue('user-consent') private userConsentQueue: Queue,
     private storage: Storage,
-  ) {
-    this.repository = this.userRepository;
-  }
+    private readonly JwtService: JwtService,
+  ) {}
 
   async getAll(): Promise<User[]> {
-    return await this.repository.find();
+    return await this.userModel.find();
   }
 
   async getById(userId: string): Promise<User> {
-    return await this.repository.findOne(userId);
+    return await this.userModel.findById(userId);
   }
 
   async create(user: User): Promise<User> {
     user.password = await hash(user.password, 10);
-    user = await this.repository.save({
+    user = await this.userModel.create({
       ...user,
+      _id: new ObjectId(),
       consentStatus: true,
       consentDate: new Date(),
     });
-    await this.userCreatedQueue.add('user-created', { userId: user.id });
+    await this.userCreatedQueue.add('user-created', { userId: user._id });
     return user;
   }
 
-  async login(userData: Partial<User>): Promise<User> {
-    const user = await this.repository.findOne({
-      where: {
-        email: userData.email,
-      },
+  async login(
+    userData: Partial<User>,
+  ): Promise<{ user: User; token?: string }> {
+    const user = await this.userModel.findOne({
+      email: userData.email,
     });
-    if (compareSync(userData.password, user.password)) {
-      return user;
+    if (compareSync(userData.password, user.password.toString())) {
+      if (user.consentStatus) {
+        const token = await this.JwtService.signAsync(user.toJSON(), {
+          secret: jwtConstants.secret,
+        });
+        return { user, token: token };
+      }
+      return { user };
     } else {
       throw new Error('Invalid credentials');
     }
@@ -55,30 +64,40 @@ export class UserService {
 
   async update(user: User): Promise<User> {
     if (user.consentStatus === true) {
-      await this.userConsentQueue.add('user-consent', { userId: user.id });
+      await this.userConsentQueue.add('user-consent', { userId: user._id });
       user.consentDate = new Date();
     }
-    return await this.repository.save(user);
+    return await this.userModel.create(user);
   }
 
   async acceptanceTerms(
-    userId: number,
-    consentStatus: boolean,
-  ): Promise<UpdateResult> {
-    const user = await this.repository.update(
-      { id: userId },
+    userId: string,
+    acceptanceTerms: Partial<AcceptanceTerm>,
+  ): Promise<any> {
+    const user = await this.userModel.updateOne(
+      { _id: new ObjectId(userId) },
       {
-        consentStatus: consentStatus,
-        consentDate: consentStatus ? new Date() : null,
+        consentStatus: true,
+        acceptanceTerms: [acceptanceTerms],
+        consentDate: new Date(),
       },
     );
-    if (consentStatus) {
-      await this.userConsentQueue.add('user-consent', { userId: userId });
-    }
+    await this.userConsentQueue.add('user-consent', { userId: userId });
     return user;
   }
 
-  async delete(userId: string): Promise<DeleteResult> {
+  async revokeTerms(userId: string): Promise<any> {
+    const user = await this.userModel.updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        consentStatus: false,
+        consentDate: null,
+      },
+    );
+    return user;
+  }
+
+  async delete(userId: string): Promise<any> {
     let deletedList: Stream;
     try {
       deletedList = await this.storage.getObject('badListId');
@@ -103,25 +122,13 @@ export class UserService {
       name: 'badListId',
       path: './deletedList',
     });
-    return await this.repository.delete(userId);
+    return await this.userModel.deleteOne({ $match: { id: userId } });
   }
 
-  async InvalidatePolicyAllUsers(): Promise<void> {
-    await this.repository.update(
+  async InvalidateAcceptanceTermsAllUsers(): Promise<void> {
+    await this.userModel.updateMany(
       {},
       { consentStatus: false, consentDate: null },
     );
-  }
-
-  async updateUserConsent(userId: number, status: boolean) {
-    await this.repository
-      .createQueryBuilder()
-      .update()
-      .set({
-        consentDate: status ? new Date() : null,
-        consentStatus: status,
-      })
-      .where('id = :userId', { userId })
-      .execute();
   }
 }

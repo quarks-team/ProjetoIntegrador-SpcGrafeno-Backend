@@ -1,37 +1,58 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
+import { HydratedDocument } from 'mongoose';
 
-@Entity('user')  // Mapeando explicitamente para a tabela 'user'
+export type UserDocument = HydratedDocument<User>;
+@Schema()
 export class User {
-  @PrimaryGeneratedColumn()  // A coluna id será um auto-incremento
-  id: number;  // Mudando de 'uuid' para 'number' para corresponder ao tipo SERIAL
-
-  @Column({ unique: true })
+  @Prop()
+  _id: ObjectId;
+  @Prop()
   username: string;
-
-  @Column()
+  @Prop()
   password: string;
-
-  @Column()
+  @Prop()
   email: string;
-
-  @Column({ name: 'consent_status', default: false, nullable: true })
+  @Prop()
   consentStatus: boolean;
-
-  @Column({ name: 'consent_date', nullable: true })
-  consentDate: Date | null;  // Usando 'null' para ser consistente com o banco de dados
-
-  @Column({ name: 'cnpj', nullable: true })
-  cnpj: string | null;  // Usando 'null' para ser consistente com o banco de dados
-
-  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Prop()
+  acceptanceTerms?: AcceptanceTerms[];
+  @Prop()
+  consentDate: Date;
+  @Prop()
+  cnpj: string;
+  @Prop()
   createdAt: Date;
-
-  @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Prop()
   updatedAt: Date;
 }
+
+@Schema()
+export class AcceptanceTerms {
+  @Prop()
+  id: string;
+  @Prop()
+  version: number;
+  @Prop()
+  description?: string;
+  @Prop()
+  items: AcceptanceTermItem[];
+  @Prop()
+  createdAt: Date;
+  @Prop()
+  restrictions: string[];
+}
+
+@Schema()
+export class AcceptanceTermItem {
+  @Prop()
+  name: string;
+  @Prop()
+  description: string;
+  @Prop()
+  tag: string;
+  @Prop()
+  isMandatory: boolean;
+}
+
+export const UserSchema = SchemaFactory.createForClass(User);

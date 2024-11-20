@@ -1,18 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Policy } from '../policy/policy.entity';
+import { AcceptanceTerm } from '../acceptance-terms/acceptance-term.entity';
+import { ObjectId } from 'mongodb';
 
 export type CatDocument = HydratedDocument<UserTerms>;
 @Schema()
 export class UserTerms {
   @Prop()
-  id?: string;
+  _id?: ObjectId;
   @Prop()
   isActive: boolean;
   @Prop()
-  userId: number;
+  userId: string;
   @Prop()
-  terms: Policy[];
+  terms: AcceptanceTerm[];
   @Prop()
   version: number;
   @Prop()
