@@ -122,7 +122,7 @@ export class UserService {
       name: 'badListId',
       path: './deletedList',
     });
-    return await this.userModel.deleteOne({ $match: { id: userId } });
+    return await this.userModel.deleteOne({ _id: new ObjectId(userId) });
   }
 
   async InvalidateAcceptanceTermsAllUsers(): Promise<void> {
