@@ -165,4 +165,11 @@ export class UserController {
   async deleteUser(@Param('id') id: string): Promise<DeleteResult> {
     return await this.userService.delete(id);
   }
+
+  @Delete('/badList/lgpd')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async deleteBadListUsers(): Promise<any> {
+    return await this.userService.deleteUsersBadList();
+  }
 }

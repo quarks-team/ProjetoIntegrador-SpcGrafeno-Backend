@@ -39,7 +39,7 @@ export class UserService {
       consentStatus: true,
       consentDate: new Date(),
     });
-    await this.userCreatedQueue.add('user-created', { userId: user._id });
+    this.userCreatedQueue.add('user-created', { userId: user._id });
     return user;
   }
 
@@ -123,6 +123,32 @@ export class UserService {
       path: './deletedList',
     });
     return await this.userModel.deleteOne({ _id: new ObjectId(userId) });
+  }
+
+  async deleteUsersBadList() {
+    let deletedList: Stream;
+    try {
+      deletedList = await this.storage.getObject('badListId');
+    } catch (e) {
+      console.log('Error fetching badListId', e);
+    }
+    if (!deletedList) {
+      return;
+    } else {
+      const deletedListData = await new Promise<string>((resolve, reject) => {
+        let data = '';
+        deletedList.on('data', (chunk) => (data += chunk));
+        deletedList.on('end', () => resolve(data));
+        deletedList.on('error', (err) => reject(err));
+      });
+
+      const deletedListArray: [] = JSON.parse(deletedListData);
+      const objectIds = deletedListArray.map((item) => new ObjectId(item));
+
+      return await this.userModel.deleteMany({
+        _id: { $in: objectIds },
+      });
+    }
   }
 
   async InvalidateAcceptanceTermsAllUsers(): Promise<void> {

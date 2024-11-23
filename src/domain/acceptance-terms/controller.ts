@@ -8,7 +8,7 @@ import {
   Controller,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiParam } from '@nestjs/swagger';
 import { AcceptanceTerm } from 'src/domain/acceptance-terms/acceptance-term.entity';
 import { DeleteResult } from 'typeorm';
 import { AcceptanceTermService } from './service';
@@ -53,6 +53,7 @@ export class AcceptanceTermController {
     examples: { acceptanceTerms: AcceptanceTermsSchema },
   })
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async createAcceptanceTerm(
     @Body() acceptanceTerms: AcceptanceTerm,
   ): Promise<AcceptanceTerm> {
@@ -73,6 +74,7 @@ export class AcceptanceTermController {
     },
   })
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async updateAcceptanceTerm(
     @Body() acceptanceTerms: AcceptanceTerm,
   ): Promise<AcceptanceTerm> {
@@ -86,6 +88,7 @@ export class AcceptanceTermController {
     example: '1',
   })
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async deleteAcceptanceTerm(@Param('id') id: number): Promise<DeleteResult> {
     return await this.acceptanceTermsService.delete(id);
   }
