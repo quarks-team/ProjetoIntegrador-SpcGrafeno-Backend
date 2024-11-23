@@ -127,8 +127,6 @@ export class UserController {
       },
     },
   })
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
   async updateAcceptanceTerms(@Body() user: Partial<User>): Promise<User> {
     return await this.userService.acceptanceTerms(
       user._id.toString(),
