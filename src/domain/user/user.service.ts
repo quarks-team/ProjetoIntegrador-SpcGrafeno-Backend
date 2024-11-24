@@ -27,9 +27,20 @@ export class UserService {
     return await this.userModel.find();
   }
 
-  async getById(userId: string): Promise<User> {
-    return await this.userModel.findById(userId);
-  }
+    async getById(userId: string): Promise<User | null> {
+      try {
+    
+        const user = await this.userModel.findById(new ObjectId(userId));
+    
+        if (!user) {
+          return null;
+        }
+        return user;
+      } catch (error) {
+        console.error('Error finding the user:', error);
+        throw new Error('Error finding the user');
+      }
+    }
 
   async create(user: User): Promise<User> {
     user.password = await hash(user.password, 10);
