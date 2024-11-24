@@ -61,13 +61,31 @@ const UserSchema = {
 // };
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get()
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   async getAllUsers(): Promise<User[]> {
     return await this.userService.getAll();
+  }
+
+  @Get('/id/:id')  // Aqui, o `:id` é o parâmetro capturado
+  @ApiParam({
+    name: 'id',
+    required: true,
+    type: 'string',
+  })
+  async getUserById(@Param('id') userId: string, @Res() res: Response): Promise<Response> {
+    try {
+      const user = await this.userService.getById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      return res.status(200).json(user);
+    } catch (e) {
+      return res.status(500).json({ message: e.message });
+    }
   }
 
   @Post()
