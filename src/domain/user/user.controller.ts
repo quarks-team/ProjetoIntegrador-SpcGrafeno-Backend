@@ -70,7 +70,7 @@ export class UserController {
     return await this.userService.getAll();
   }
 
-  @Get('/id/:id')  // Aqui, o `:id` é o parâmetro capturado
+  @Get('/id/:id') 
   @ApiParam({
     name: 'id',
     required: true,

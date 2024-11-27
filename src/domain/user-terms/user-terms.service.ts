@@ -58,7 +58,7 @@ export class UserTermsService {
   }
 
   async getUserTermsByUserId(userId: string): Promise<any> {
-    const response = await this.userTermsModel.findOne({ userId: userId });
+    const response = await this.userTermsModel.find({ userId: userId });
     return response;
   }
 }
