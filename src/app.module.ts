@@ -7,6 +7,9 @@ import { DBModule } from './infra/database/db.mocule';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScriptsModule } from './infra/scripts/scripts.module';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { ExpressAdapter } from '@bull-board/express';
 @Module({
   imports: [
     MongooseModule.forRootAsync({
@@ -22,6 +25,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     DBModule,
     ApiModule,
+    ScriptsModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -33,6 +37,10 @@ import { MongooseModule } from '@nestjs/mongoose';
         },
       }),
       inject: [ConfigService],
+    }),
+    BullBoardModule.forRoot({
+      route: '/queues',
+      adapter: ExpressAdapter, // Or FastifyAdapter from `@bull-board/fastify`
     }),
   ],
 })

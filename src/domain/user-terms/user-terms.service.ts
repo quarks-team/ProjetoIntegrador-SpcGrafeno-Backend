@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { AcceptanceTerms } from '../user/user.entity';
 
 @Injectable()
 export class UserTermsService {
@@ -14,19 +15,17 @@ export class UserTermsService {
     @InjectModel('UserTerms') private readonly userTermsModel: Model<UserTerms>,
   ) {}
 
-  async createUserTerms(userId: string): Promise<void> {
-    const terms = await this.acceptanceTermsService.getAll();
-
-    const version = terms.reduce(
-      (max, item) => (item.version > max ? item.version : max),
-      0,
-    );
-
+  async createUserTerms(
+    userId: string,
+    acceptanceTerms: Partial<AcceptanceTerms>,
+    revoked?: boolean,
+  ): Promise<void> {
     const userTerms: UserTerms = {
+      _id: new ObjectId(),
       userId: userId,
-      terms: terms,
-      isActive: true,
-      version: version,
+      terms: acceptanceTerms[0] as AcceptanceTerms,
+      isActive: revoked ? false : true,
+      version: acceptanceTerms.version,
       acceptanceDate: new Date(),
       updatedAt: new Date(),
     };

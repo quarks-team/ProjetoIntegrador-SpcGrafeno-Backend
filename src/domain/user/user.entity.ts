@@ -30,7 +30,7 @@ export class User {
 @Schema()
 export class AcceptanceTerms {
   @Prop()
-  id: string;
+  _id: string;
   @Prop()
   version: number;
   @Prop()

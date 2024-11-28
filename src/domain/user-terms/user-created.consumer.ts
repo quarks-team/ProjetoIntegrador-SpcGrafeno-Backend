@@ -10,6 +10,10 @@ export class UserConsumer extends WorkerHost {
     super();
   }
   async process(job: Job<any, any, string>): Promise<any> {
-    return await this.userTermsService.createUserTerms(job.data.userId);
+    return await this.userTermsService.createUserTerms(
+      job.data.userId,
+      job.data.acceptanceTerms,
+      job.data.revoked,
+    );
   }
 }
