@@ -21,6 +21,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@bull-board/api": "^6.5.3",
+    "@bull-board/express": "^6.5.3",
+    "@bull-board/nestjs": "^6.5.3",
     "@nestjs/bullmq": "^10.2.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
@@ -33,6 +36,7 @@
     "@testcontainers/postgresql": "^10.13.1",
     "@types/bcrypt": "^5.0.2",
     "aws-sdk": "^2.1691.0",
+    "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.20.0",
     "minio": "^8.0.1",
