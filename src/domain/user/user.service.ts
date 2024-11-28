@@ -39,7 +39,10 @@ export class UserService {
       consentStatus: true,
       consentDate: new Date(),
     });
-    this.userCreatedQueue.add('user-created', { userId: user._id });
+    this.userCreatedQueue.add('user-created', {
+      userId: user._id,
+      acceptanceTerms: user.acceptanceTerms,
+    });
     return user;
   }
 
@@ -82,18 +85,27 @@ export class UserService {
         consentDate: new Date(),
       },
     );
-    await this.userConsentQueue.add('user-consent', { userId: userId });
+    await this.userConsentQueue.add('user-consent', {
+      userId: userId,
+      acceptanceTerms: acceptanceTerms,
+    });
     return user;
   }
 
   async revokeTerms(userId: string): Promise<any> {
-    const user = await this.userModel.updateOne(
+    await this.userModel.updateOne(
       { _id: new ObjectId(userId) },
       {
         consentStatus: false,
         consentDate: null,
       },
     );
+    const user = await this.userModel.findById(new ObjectId(userId));
+    await this.userConsentQueue.add('user-consent', {
+      userId: userId,
+      acceptanceTerms: user.acceptanceTerms,
+      revoked: true,
+    });
     return user;
   }
 
