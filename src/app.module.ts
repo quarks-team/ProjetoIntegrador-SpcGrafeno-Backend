@@ -7,7 +7,6 @@ import { DBModule } from './infra/database/db.mocule';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ScriptsModule } from './infra/scripts/scripts.module';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
 @Module({
@@ -25,7 +24,6 @@ import { ExpressAdapter } from '@bull-board/express';
     }),
     DBModule,
     ApiModule,
-    ScriptsModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
