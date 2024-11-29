@@ -2,7 +2,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Delete,
   Param,
   Controller,
@@ -59,26 +58,6 @@ export class AcceptanceTermController {
   ): Promise<AcceptanceTerm> {
     const teste = await this.acceptanceTermsService.create(acceptanceTerms);
     return teste;
-  }
-
-  @Patch()
-  @ApiBody({
-    type: AcceptanceTerm,
-    examples: {
-      acceptanceTerms: {
-        value: {
-          ...AcceptanceTermsSchema.value,
-          id: 1,
-        },
-      },
-    },
-  })
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  async updateAcceptanceTerm(
-    @Body() acceptanceTerms: AcceptanceTerm,
-  ): Promise<AcceptanceTerm> {
-    return await this.acceptanceTermsService.update(acceptanceTerms);
   }
 
   @Delete('/:id')
