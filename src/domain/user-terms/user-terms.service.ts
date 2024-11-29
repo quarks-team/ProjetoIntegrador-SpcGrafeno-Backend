@@ -57,8 +57,13 @@ export class UserTermsService {
   }
 
   async getUserTermsByUserId(userId: string): Promise<any> {
-    const response = await this.userTermsModel.find({ userId: userId })
-    return response;
+    const response = await this.userTermsModel.find({ userId: userId });
+  
+    const filteredRecords = response.filter(record => record.updatedAt);
+  
+    const sortedRecords = filteredRecords.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  
+    return sortedRecords;
   }
 
 }
