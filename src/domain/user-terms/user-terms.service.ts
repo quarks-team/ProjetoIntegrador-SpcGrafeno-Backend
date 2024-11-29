@@ -13,7 +13,7 @@ export class UserTermsService {
     private acceptanceTermsService: AcceptanceTermService,
     private userService: UserService,
     @InjectModel('UserTerms') private readonly userTermsModel: Model<UserTerms>,
-  ) {}
+  ) { }
 
   async createUserTerms(
     userId: string,
@@ -57,7 +57,10 @@ export class UserTermsService {
   }
 
   async getUserTermsByUserId(userId: string): Promise<any> {
-    const response = await this.userTermsModel.find({ userId: userId });
+    const response = await this.userTermsModel
+      .find({ userId: userId })
+      .sort({ 'terms.version': -1 });
     return response;
   }
+
 }
